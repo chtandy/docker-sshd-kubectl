@@ -1,0 +1,35 @@
+version: '3'
+services:
+  init:
+    image: busybox:latest
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      - "test ! -d /home/${USERNAME}/.ssh && mkdir /home/${USERNAME}/.ssh
+         echo ${UserAuthPubKey} > /home/${USERNAME}/.ssh/authorized_keys
+         touch /config/env1 /config/env2 /config/env3 /config/env4 /config/env5
+         chown ${USER_ID}:${USER_ID} /home/${USERNAME}
+         chown -R ${USER_ID}:${USER_ID} /home/${USERNAME}/.ssh
+         chown ${USER_ID}:${USER_ID} /config"
+    volumes:
+      - ./data/homeDir/${USERNAME}:/home/${USERNAME}
+      - ./data/config:/config
+    restart: 'no'
+
+  k8s-env1:
+    image: ubuntu-k8s
+    build:
+      context: ./
+      args:
+        USERNAME: ${USERNAME}
+        USER_ID: ${USER_ID}
+    hostname: ${HOSTNAME}-k8s-lab
+    restart: always
+    volumes:
+      - ./data/homeDir/${USERNAME}:/home/${USERNAME}
+      - ./data/data:/data
+      - ./data/config/env1:/home/${USERNAME}/.kube/config
+    ports:
+      - "1021:22"
+    depends_on:
+      - init
+
