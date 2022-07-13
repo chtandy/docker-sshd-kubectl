@@ -5,7 +5,7 @@ MAINTAINER cht.andy@gmail.com
 RUN set -eux \
   && echo "######### apt install sshd ##########" \
   && apt-get update \
-  && apt-get install --assume-yes openssh-client openssh-server curl \
+  && apt-get install --assume-yes openssh-client openssh-server curl vim \
   && rm -rf /var/lib/apt/lists/* && apt-get clean \
   && sed -i 's|#PasswordAuthentication yes|PasswordAuthentication no|' /etc/ssh/sshd_config \
   && { \
