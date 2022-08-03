@@ -4,12 +4,13 @@ services:
     image: busybox:latest
     entrypoint: ["/bin/sh", "-c"]
     command: |
-      - "test ! -d /home/${USERNAME}/.ssh && mkdir /home/${USERNAME}/.ssh
-         echo ${UserAuthPubKey} > /home/${USERNAME}/.ssh/authorized_keys
-         touch /config/env1 /config/env2 /config/env3 /config/env4 /config/env5
-         chown ${USER_ID}:${USER_ID} /home/${USERNAME}
-         chown -R ${USER_ID}:${USER_ID} /home/${USERNAME}/.ssh
-         chown ${USER_ID}:${USER_ID} /config"
+      - "test ! -d /home/${USERNAME}/.ssh && mkdir /home/${USERNAME}/.ssh;
+         test ! -d /config && mkdir /config;
+         echo ${UserAuthPubKey} > /home/${USERNAME}/.ssh/authorized_keys;
+         test ! -f /config/env1 && touch /config/env1;
+         test ! -f /config/env1 && touch /config/env1;
+         chown -R ${USER_ID}:${USER_ID} /home/${USERNAME};
+         chown -R ${USER_ID}:${USER_ID} /config;"
     volumes:
       - ./data/homeDir/${USERNAME}:/home/${USERNAME}
       - ./data/config:/config
@@ -23,13 +24,15 @@ services:
         USERNAME: ${USERNAME}
         USER_ID: ${USER_ID}
     hostname: ${HOSTNAME}-k8s-lab
+    environment:
+      - TZ=Asia/Taipei
     restart: always
     volumes:
       - ./data/homeDir/${USERNAME}:/home/${USERNAME}
       - ./data/data:/data
       - ./data/config/env1:/home/${USERNAME}/.kube/config
     ports:
-      - "1021:22"
+      - "1022:22"
     depends_on:
       - init
 
